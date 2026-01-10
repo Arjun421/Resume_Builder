@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import Modal from 'react-modal'
-
-import {useNavigate} from "react-router-dom";
+import { useState } from 'react'
+import Modal from '../components/Modal'
+import Login from './Auth/Login'
+import SignUp  from './Auth/SignUp';
 const LandingPage = () => {
-  const navigate = useNavigate()
   const [openAuthModal,setOpenAuthModal]=useState(false)
   const [currentPage,setCurrentPage] = useState("login")
   const handleCTA=()=>{};
+  
   return (
     <div className='w-full min-h-full bg-white pb-96'>
       <div className='container mx-auto px-4 py-6'>
@@ -82,6 +82,11 @@ const LandingPage = () => {
   }}
   hideHeader
 >
+  <div>
+    {currentPage==="login" && <Login setCurrentPage={setCurrentPage}/>}
+    {currentPage==="signup" && 
+    <SignUp setCurrentPage={setCurrentPage}/>}
+  </div>
   <div>
     
   </div>
