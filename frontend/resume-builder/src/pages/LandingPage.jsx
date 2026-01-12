@@ -1,10 +1,14 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import Modal from '../components/Modal'
+import UserProfile from '../components/UserProfile'
+import { UserContext } from '../context/userContext'
 import Login from './Auth/Login'
 import SignUp  from './Auth/SignUp';
+
 const LandingPage = () => {
   const [openAuthModal,setOpenAuthModal]=useState(false)
   const [currentPage,setCurrentPage] = useState("login")
+  const { isAuthenticated } = useContext(UserContext)
   const handleCTA=()=>{};
   
   return (
@@ -13,12 +17,20 @@ const LandingPage = () => {
         {/*Header */}
         <header className='flex justify-between items-center mb-16'>
           <div className='text-xl font-bold'>Resume Builder</div>
-          <button className='bg-purple-100 text-sm font-semibold text-black px-7 py-2.5 rounded-lg hover:bg-gray-800 hover:text-white transition-colors cursor-pointer'
-          onClick={()=>setOpenAuthModal(true)}
-          >
-            Login/SignUp
-            
-          </button>
+          
+          {/* Right side - UserProfile or Login Button */}
+          <div className="flex items-center">
+            {isAuthenticated ? (
+              <UserProfile />
+            ) : (
+              <button 
+                className='bg-purple-100 text-sm font-semibold text-black px-7 py-2.5 rounded-lg hover:bg-gray-800 hover:text-white transition-colors cursor-pointer'
+                onClick={()=>setOpenAuthModal(true)}
+              >
+                Login/SignUp
+              </button>
+            )}
+          </div>
         </header>
         {/*Hero Content*/}
         <div className='flex flex-col md:flex-row items-center'>

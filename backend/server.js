@@ -6,9 +6,9 @@ const connectDB=require("./config/db")
 const app = express()
 const authRoutes = require("./routes/authRoutes")
 const resumeRoutes = require("./routes/resumeRoutes")
+const uploadRoutes = require("./routes/uploadRoutes")
 console.log("🚀 Starting server...");
-console.log("Environment variables loaded:");
-console.log("- PORT:", process.env.PORT);
+
 console.log("- MONGO_URI:", process.env.MONGO_URI ? "✅ Set" : "❌ Not set");
 
 //middleware to handle cors
@@ -29,7 +29,8 @@ app.use(express.json())
 
 //Routes
 app.use("/api/auth",authRoutes)
-// app.use("/api/resume",resumeRoutes)
+app.use("/api/resume",resumeRoutes)
+app.use("/api/upload",uploadRoutes)
 //server uploads folder 
 app.use(
   "/uploads",
