@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import moment from "moment";
 import axiosInstance from "../../utils/axiosInstance";
+import DashboardLayout from "../../components/layouts/DashboardLayout";
+import Modal from "../../components/Modal";
+import { LuCirclePlus } from "react-icons/lu";
+import ResumeSummaryCard from "../../components/Cards/ResumeSummaryCard";
+import CreateResumeForm from './CreateResumeForm';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -55,55 +61,44 @@ const Dashboard = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Resumes</h1>
-          <button
-            onClick={() => setOpenCreateModal(true)}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            Create New Resume
-          </button>
-        </div>
+  console.log('🔍 Dashboard render - openCreateModal:', openCreateModal);
 
-        {allResumes.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">No resumes found. Create your first resume!</p>
-            <button
-              onClick={() => setOpenCreateModal(true)}
-              className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Create Resume
-            </button>
+  return (
+    <DashboardLayout>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-7 pt-1 pb-6 px-4 md:px-0">
+        <div 
+          className="h-[300px] flex flex-col gap-5 items-center justify-center bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:bg-purple-50/5 cursor-pointer"
+          onClick={() => {
+            console.log('🔥 Add New Resume clicked!');
+            console.log('🔍 Current openCreateModal state:', openCreateModal);
+            setOpenCreateModal(true);
+            console.log('🔍 Setting openCreateModal to true');
+          }}
+        >
+          <div className="w-12 h-12 flex justify-center items-center bg-purple-200/60 rounded-2xl">
+            <LuCirclePlus className="text-xl text-purple-500"/>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allResumes.map((resume) => (
-              <div
-                key={resume._id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/resume/${resume._id}`)}
-              >
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {resume.title || 'Untitled Resume'}
-                </h3>
-                <p className="text-gray-500 text-sm mb-4">
-                  Created: {new Date(resume.createdAt).toLocaleDateString()}
-                </p>
-                <div className="flex justify-between items-center">
-                  <span className="text-purple-600 text-sm font-medium">
-                    Edit Resume
-                  </span>
-                  <span className="text-gray-400">→</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          <h3 className="font-medium text-gray-800">Add New Resume</h3>
+        </div>
+        
+        {allResumes?.map((resume) => (
+          <ResumeSummaryCard
+            key={resume?._id}
+            imageUrl={resume?.thumbnailLink || null}
+            title={resume?.title}
+            lastUpdated={resume?.updatedAt ? moment(resume.updatedAt).format("Do MMM YYYY") : ""}
+            onSelect={() => navigate(`/resume/${resume?._id}`)}
+          />
+        ))}
       </div>
-    </div>
+      
+      <Modal isOpen={openCreateModal} onClose={() => setOpenCreateModal(false)} hideHeader>
+        <CreateResumeForm 
+          onClose={() => setOpenCreateModal(false)}
+          onResumeCreated={fetchAllResumes}
+        />
+      </Modal>
+    </DashboardLayout>
   );
 };
 
