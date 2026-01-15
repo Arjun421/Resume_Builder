@@ -16,7 +16,9 @@ import toast from 'react-hot-toast';
 import DashboardLayout from '../../components/layouts/DashboardLayout';
 import axiosInstance from '../../utils/axiosInstance';
 import StepProgress from '../../components/StepProgress';
-
+import ProfileInfoCard from '../../components/Cards/ProfileInfoCard';
+import ContactInfoForm from './Forms/ContactInfoForm';
+import WorkExperienceForm from './Forms/WorkExperienceForm';
 const EditResume = () => {
   const { resumeId } = useParams();
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ const EditResume = () => {
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState("profile-info");
+  const [currentPage, setCurrentPage] = useState("contact-info");
   const [progress, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState({
   title: "",
@@ -109,8 +111,60 @@ const EditResume = () => {
   const goToNextStep=()=>{}
   //back
   const goBack = ()=>{}
-  const renderForm =()=>{}
-  const updateSection=(section,key,value)=>{}
+const renderForm = () => {
+  switch(currentPage) {
+    case "profile-info":
+      return (
+        <ProfileInfoCard
+          profileData={resumeData?.profileInfo}
+          updateSection={(key, value) => {
+            updateSection("profile-info", key, value)
+          }}
+          onNext={validateAndNext}
+        />
+      );
+      case "contact-info":
+  return (
+    <ContactInfoForm
+      contactInfo={resumeData?.contactInfo}
+      updateSection={(key, value) => {
+        updateSection("contact-info", key, value);
+      }}
+    />
+  );
+  case "work-experience":
+  return (
+    <WorkExperienceForm
+      workExperience={resumeData?.workExperience}
+      updateArrayItems={(index, key, value) => 
+        updateArrayItems('workExperience', index, key, value)
+      }
+      addArrayItems={(newItem) => 
+        addArrayItems("workExperience", newItem)
+      }
+      removeArrayItem={(index) => 
+        removeArrayItem("workExperience", index)
+      }
+    />
+  )
+  
+
+
+    default:
+      return null
+  }
+}
+
+  const updateSection = (section, key, value) => {
+  setResumeData((prev) => ({
+    ...prev,
+    [section]: {
+      ...prev[section],
+      [key]: value
+    }
+  }))
+}
+
   const updateArrayItems=(section,index,key,value)=>{}
   const addArrayItems=(section,newItem)=>{}
   const removeArrayItem=(section,index)=>{}
@@ -199,7 +253,7 @@ return (
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
         <div className='bg-white rounded-lg border border-purple-100 overflow-hidden'>
-          <StepProgress progress={progress} />
+          <StepProgress progress={0} />
           {renderForm()}
           <div className='mx-5'>
             {errorMsg &&(
