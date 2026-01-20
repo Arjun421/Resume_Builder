@@ -19,6 +19,9 @@ import StepProgress from '../../components/StepProgress';
 import ProfileInfoCard from '../../components/Cards/ProfileInfoCard';
 import ContactInfoForm from './Forms/ContactInfoForm';
 import WorkExperienceForm from './Forms/WorkExperienceForm';
+import EducationDetailsForm from './Forms/EducationDetailsForm';
+import SkillsInfoForm from './Forms/SkillsInfoForm';
+import ProjectsDetailFrom from './Forms/ProjectsDetailFrom';
 const EditResume = () => {
   const { resumeId } = useParams();
   const navigate = useNavigate();
@@ -32,7 +35,8 @@ const EditResume = () => {
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-  const [currentPage, setCurrentPage] = useState("contact-info");
+const [currentPage, setCurrentPage] = useState("skills");
+
   const [progress, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState({
   title: "",
@@ -147,6 +151,45 @@ const renderForm = () => {
       }
     />
   )
+  case "education-info":
+  return(
+    <EducationDetailsForm
+      educationInfo={resumeData?.education}
+      updateArrayItems={(index,key,value)=>{
+        updateArrayItems("education",index,key,value)
+      }} 
+      addArrayItems={(newItem)=>addArrayItems("education",newItem)}
+      removeArrayItem={(index)=>removeArrayItem("education",index)}
+    />
+  )
+  case "skills":
+  return (
+    <SkillsInfoForm
+      skillsInfo={resumeData?.skills}
+      updateArrayItems={(index, key, value) => 
+        updateArrayItems("skills", index, key, value)
+      }
+      addArrayItems={(newItem) => 
+        addArrayItems("skills", newItem)
+      }
+      removeArrayItem={(index) => 
+        removeArrayItem("skills", index)
+      }
+    />
+  );
+  case "projects":
+  return (
+    <ProjectsDetailFrom
+      projectInfo={resumeData?.projects}
+      updateArrayItem={({ index, key, value }) => {
+        updateArrayItem("projects", index, key, value);
+      }}
+      addArrayItem={(newItem) => addArrayItem("projects", newItem)}
+      removeArrayItem={(index) => removeArrayItem("projects", index)}
+    />
+  );
+
+
   
 
 
@@ -165,9 +208,41 @@ const renderForm = () => {
   }))
 }
 
-  const updateArrayItems=(section,index,key,value)=>{}
-  const addArrayItems=(section,newItem)=>{}
-  const removeArrayItem=(section,index)=>{}
+  const updateArrayItems=(section,index,key,value)=>{
+    setResumeData((prev)=>{
+      const updatedArray =[...prev[section]]
+      if(key===null){
+        updatedArray[index]=value;
+
+      }else{
+        updatedArray[index]={
+          ...updatedArray[index],
+          [key]:value
+        }
+      }
+      return {
+        ...prev,
+        [section]:updatedArray
+      }
+    })
+  }
+  const addArrayItems=(section,newItem)=>{
+    setResumeData((prev)=>({
+      ...prev,
+      [section]:[...prev[section],newItem]
+
+    }))
+  }
+  const removeArrayItem=(section,index)=>{
+    setResumeData((prev)=>{
+      const updateArray=[...prev[section]]
+      updateArray.splice(index,1)
+      return {
+        ...prev,
+        [section]:updateArray
+      }
+    })
+  }
   const fetchResumeDetailsById=async()=>{
     try {
       console.log('📋 Fetching resume details for ID:', resumeId);
