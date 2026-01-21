@@ -22,6 +22,8 @@ import WorkExperienceForm from './Forms/WorkExperienceForm';
 import EducationDetailsForm from './Forms/EducationDetailsForm';
 import SkillsInfoForm from './Forms/SkillsInfoForm';
 import ProjectsDetailFrom from './Forms/ProjectsDetailFrom';
+import CertificationInfoForm from './Forms/CertificationInfoForm';
+import AdditionalInfoForm from './Forms/AdditionalInfoForm';
 const EditResume = () => {
   const { resumeId } = useParams();
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const EditResume = () => {
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-const [currentPage, setCurrentPage] = useState("skills");
+const [currentPage, setCurrentPage] = useState("additionalInfo");
 
   const [progress, setProgress] = useState(0);
   const [resumeData, setResumeData] = useState({
@@ -181,18 +183,72 @@ const renderForm = () => {
   return (
     <ProjectsDetailFrom
       projectInfo={resumeData?.projects}
-      updateArrayItem={({ index, key, value }) => {
-        updateArrayItem("projects", index, key, value);
-      }}
-      addArrayItem={(newItem) => addArrayItem("projects", newItem)}
-      removeArrayItem={(index) => removeArrayItem("projects", index)}
+      updateArrayItems={(index, key, value) => 
+        updateArrayItems("projects", index, key, value)
+      }
+      addArrayItems={(newItem) => 
+        addArrayItems("projects", newItem)
+      }
+      removeArrayItem={(index) => 
+        removeArrayItem("projects", index)
+      }
     />
   );
-
-
-  
-
-
+  case "certifications":
+  return (
+    <CertificationInfoForm
+      certificationInfo={resumeData?.certification}
+      updateArrayItems={(index, key, value) => 
+        updateArrayItems("certification", index, key, value)
+      }
+      addArrayItems={(newItem) => 
+        addArrayItems("certification", newItem)
+      }
+      removeArrayItem={(index) => 
+        removeArrayItem("certification", index)
+      }
+    />
+  );
+  case "additionalInfo":
+  return (
+    <AdditionalInfoForm
+      languageInfo={resumeData?.language}
+      interestsInfo={resumeData?.interests}
+      updateArrayItems={updateArrayItems}
+      addArrayItems={addArrayItems}
+      removeArrayItem={removeArrayItem}
+      updateSection={updateSection}
+    />
+  );
+  case "certifications":
+  return (
+    <CertificationInfoForm
+      projectInfo={resumeData?.certification}
+      updateArrayItem={(index, key, value) => {
+        updateArrayItem("certifications", index, key, value);
+      }}
+      addArrayItem={(newItem) => addArrayItems("certifications", newItem)}
+      removeArrayItem={(index) =>
+        removeArrayItem("certifications", index)
+      }
+    />
+  );
+  case "additionalInfo":
+  return (
+    <AdditionalInfoForm
+      languages={resumeData.language}
+      interests={resumeData.interests}
+      updateArrayItem={(section, index, key, value) =>
+        updateArrayItem(section, index, key, value)
+      }
+      addArrayItem={(section, newItem) =>
+        addArrayItem(section, newItem)
+      }
+      removeArrayItem={(section, index) =>
+        removeArrayItem(section, index)
+      }
+    />
+  );
     default:
       return null
   }
@@ -209,6 +265,7 @@ const renderForm = () => {
 }
 
   const updateArrayItems=(section,index,key,value)=>{
+    console.log('🔄 updateArrayItems called:', { section, index, key, value });
     setResumeData((prev)=>{
       const updatedArray =[...prev[section]]
       if(key===null){
@@ -220,6 +277,7 @@ const renderForm = () => {
           [key]:value
         }
       }
+      console.log('📊 Updated array:', updatedArray);
       return {
         ...prev,
         [section]:updatedArray
@@ -227,6 +285,7 @@ const renderForm = () => {
     })
   }
   const addArrayItems=(section,newItem)=>{
+    console.log('➕ addArrayItems called:', { section, newItem });
     setResumeData((prev)=>({
       ...prev,
       [section]:[...prev[section],newItem]
