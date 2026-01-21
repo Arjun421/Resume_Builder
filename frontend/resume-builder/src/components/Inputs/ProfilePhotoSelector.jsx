@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react'
 import { LuUser, LuUpload, LuTrash } from "react-icons/lu";
 
-const ProfilePhotoSelector = ({ image, setImage }) => {
+const ProfilePhotoSelector = ({ image, setImage, existingPreviewUrl }) => {
   const inputRef = useRef(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(existingPreviewUrl || null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -37,7 +37,7 @@ const ProfilePhotoSelector = ({ image, setImage }) => {
       />
 
       <div className="relative">
-        {!image ? (
+        {!image && !previewUrl ? (
           <>
             {/* User Avatar Placeholder */}
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">

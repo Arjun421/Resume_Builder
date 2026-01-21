@@ -10,11 +10,16 @@ const ProfileInfoCard = ({ profileData, updateSection, onNext }) => {
       <div className='space-y-4'>
         {/* Profile Photo */}
         <ProfilePhotoSelector
-          profileImg={profileData?.profileImg}
-          previewUrl={profileData?.profilePreviewUrl}
-          onChange={(file, previewUrl) => {
+          image={profileData?.profileImg}
+          existingPreviewUrl={profileData?.profilePreviewUrl}
+          setImage={(file) => {
             updateSection('profileImg', file);
-            updateSection('profilePreviewUrl', previewUrl);
+            if (file) {
+              const previewUrl = URL.createObjectURL(file);
+              updateSection('profilePreviewUrl', previewUrl);
+            } else {
+              updateSection('profilePreviewUrl', null);
+            }
           }}
         />
 

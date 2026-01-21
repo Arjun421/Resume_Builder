@@ -24,6 +24,7 @@ import SkillsInfoForm from './Forms/SkillsInfoForm';
 import ProjectsDetailFrom from './Forms/ProjectsDetailFrom';
 import CertificationInfoForm from './Forms/CertificationInfoForm';
 import AdditionalInfoForm from './Forms/AdditionalInfoForm';
+import RenderResume from '../../components/ResumeTemplates/RenderResume';
 const EditResume = () => {
   const { resumeId } = useParams();
   const navigate = useNavigate();
@@ -37,9 +38,28 @@ const EditResume = () => {
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
-const [currentPage, setCurrentPage] = useState("additionalInfo");
+const [currentPage, setCurrentPage] = useState("profile-info");
+
+  const steps = [
+    "profile-info",
+    "contact-info", 
+    "work-experience",
+    "education-info",
+    "skills",
+    "projects",
+    "certifications",
+    "additionalInfo"
+  ];
+
+  const currentStepIndex = steps.indexOf(currentPage);
+  const totalSteps = steps.length;
 
   const [progress, setProgress] = useState(0);
+
+  // Calculate progress based on current step
+  const calculateProgress = () => {
+    return Math.round(((currentStepIndex + 1) / totalSteps) * 100);
+  };
   const [resumeData, setResumeData] = useState({
   title: "",
   thumbnailLink: "",
@@ -111,12 +131,153 @@ const [currentPage, setCurrentPage] = useState("additionalInfo");
   const [errorMsg,setErrorMsg]=useState("")
   const [isLoading,setIsLoading]=useState(false)
 
-  //validate Inputs
-  const validateAndNext=(e)=>{};
+  
+  const validateAndNext=(e)=>{
+    e?.preventDefault();
+    const errors = [];
+    
+    switch(currentPage) {
+      case "profile-info":
+        if (!resumeData.profileInfo?.fullName?.trim()) {
+          errors.push("Full name is required");
+        }
+        if (!resumeData.profileInfo?.designation?.trim()) {
+          errors.push("Designation is required");
+        }
+        if (!resumeData.profileInfo?.summary?.trim()) {
+          errors.push("Professional summary is required");
+        }
+        break;
+        
+      case "contact-info":
+        if (!resumeData.contactInfo?.email?.trim()) {
+          errors.push("Email is required");
+        }
+        if (!resumeData.contactInfo?.phone?.trim()) {
+          errors.push("Phone number is required");
+        }
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (resumeData.contactInfo?.email && !emailRegex.test(resumeData.contactInfo.email)) {
+          errors.push("Please enter a valid email address");
+        }
+        break;
+        
+      case "work-experience":
+        if (!resumeData.workExperience || resumeData.workExperience.length === 0) {
+          errors.push("At least one work experience is required");
+        } else {
+          resumeData.workExperience.forEach((exp, index) => {
+            if (!exp.company?.trim()) {
+              errors.push(`Company name is required for experience ${index + 1}`);
+            }
+            if (!exp.role?.trim()) {
+              errors.push(`Role is required for experience ${index + 1}`);
+            }
+            if (!exp.startDate?.trim()) {
+              errors.push(`Start date is required for experience ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      case "education-info":
+        if (!resumeData.education || resumeData.education.length === 0) {
+          errors.push("At least one education entry is required");
+        } else {
+          resumeData.education.forEach((edu, index) => {
+            if (!edu.degree?.trim()) {
+              errors.push(`Degree is required for education ${index + 1}`);
+            }
+            if (!edu.institution?.trim()) {
+              errors.push(`Institution is required for education ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      case "skills":
+        if (!resumeData.skills || resumeData.skills.length === 0) {
+          errors.push("At least one skill is required");
+        } else {
+          resumeData.skills.forEach((skill, index) => {
+            if (!skill.name?.trim()) {
+              errors.push(`Skill name is required for skill ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      case "projects":
+        // Projects are optional, but if added, validate required fields
+        if (resumeData.projects && resumeData.projects.length > 0) {
+          resumeData.projects.forEach((project, index) => {
+            if (!project.title?.trim()) {
+              errors.push(`Project title is required for project ${index + 1}`);
+            }
+            if (!project.description?.trim()) {
+              errors.push(`Project description is required for project ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      case "certifications":
+        // Certifications are optional, but if added, validate required fields
+        if (resumeData.certification && resumeData.certification.length > 0) {
+          resumeData.certification.forEach((cert, index) => {
+            if (!cert.title?.trim()) {
+              errors.push(`Certification title is required for certification ${index + 1}`);
+            }
+            if (!cert.issuser?.trim()) {
+              errors.push(`Issuer is required for certification ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      case "additionalInfo":
+        // Additional info is optional, but if languages are added, validate them
+        if (resumeData.language && resumeData.language.length > 0) {
+          resumeData.language.forEach((lang, index) => {
+            if (!lang.name?.trim()) {
+              errors.push(`Language name is required for language ${index + 1}`);
+            }
+          });
+        }
+        break;
+        
+      default:
+        break;
+    }
+    
+    if (errors.length > 0) {
+      setErrorMsg(errors.join(", "));
+      return;
+    }
+    
+    // Clear errors and proceed to next step
+    setErrorMsg("");
+    goToNextStep();
+  };
+  
   //function to navigate to next page
-  const goToNextStep=()=>{}
+  const goToNextStep=()=>{
+    if (currentStepIndex < steps.length - 1) {
+      const nextStep = steps[currentStepIndex + 1];
+      setCurrentPage(nextStep);
+      setProgress(calculateProgress());
+    }
+  }
+  
   //back
-  const goBack = ()=>{}
+  const goBack = ()=>{
+    if (currentStepIndex > 0) {
+      const prevStep = steps[currentStepIndex - 1];
+      setCurrentPage(prevStep);
+      setProgress(calculateProgress());
+    }
+  }
 const renderForm = () => {
   switch(currentPage) {
     case "profile-info":
@@ -124,7 +285,7 @@ const renderForm = () => {
         <ProfileInfoCard
           profileData={resumeData?.profileInfo}
           updateSection={(key, value) => {
-            updateSection("profile-info", key, value)
+            updateSection("profileInfo", key, value)
           }}
           onNext={validateAndNext}
         />
@@ -134,7 +295,7 @@ const renderForm = () => {
     <ContactInfoForm
       contactInfo={resumeData?.contactInfo}
       updateSection={(key, value) => {
-        updateSection("contact-info", key, value);
+        updateSection("contactInfo", key, value);
       }}
     />
   );
@@ -340,17 +501,24 @@ const renderForm = () => {
   const updateResumeDetails = async(thumbnailLink,profilePreviewUrl)=>{}
   const handleDeleteResume = async()=>{}
   const reactToPrintFn=useReactToPrint({contentRef:resumeDownloadRef})
-  const updateBaseWidth=()=>{}
+  const updateBaseWidth=()=>{
+    if (resumeRef.current){
+      setBaseWidth(resumeRef.current.offsetWidth)
+    }
+  }
   useEffect(()=>{
     updateBaseWidth()
     window.addEventListener('resize',updateBaseWidth)
     if(resumeId){
       fetchResumeDetailsById()
     }
+    // Set initial progress
+    setProgress(calculateProgress());
+    
     return ()=>{
       window.addEventListener('resize',updateBaseWidth)
     }
-  },[])
+  },[currentPage])
 return (
   <DashboardLayout>
     <div className="container mx-auto">
@@ -386,8 +554,8 @@ return (
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-        <div className='bg-white rounded-lg border border-purple-100 overflow-hidden'>
-          <StepProgress progress={0} />
+        {/* {<div className='bg-white rounded-lg border border-purple-100 overflow-hidden'>
+          <StepProgress progress={calculateProgress()} />
           {renderForm()}
           <div className='mx-5'>
             {errorMsg &&(
@@ -398,7 +566,7 @@ return (
             <div className='flex items-end justify-end gap-3 mt-3 mb-5'>
             <button className='btn-small-light'
               onClick={goBack}
-              disabled={isLoading}
+              disabled={isLoading || currentStepIndex === 0}
               >
                 <LuArrowLeft className='text-[16px]'/>
                 Back
@@ -429,9 +597,16 @@ return (
             </button>
             </div>
           </div>
-        </div>
+        </div>} */}
         <div  ref={resumeRef} className='h-[100vh]'>
           {/*Resume Template*/}
+          <RenderResume
+          templateId={resumeData?.template?.theme || ""}
+          resumeData={resumeData}
+          colorPalette={resumeData?.template?.colorPalette || []}
+          containerWidth={baseWidth}
+          
+          />
         </div>
       </div>
       

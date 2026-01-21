@@ -1,7 +1,7 @@
 import React from 'react'
 import Input from '../../../components/Inputs/Input'
 import { LuTrash2, LuPlus } from 'react-icons/lu'
-const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,removeArrayItem}) => {
+const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItems,removeArrayItem}) => {
   return (
   <div className="px-5 pt-5">
     <h2 className="text-lg font-semibold text-gray-900">Education</h2>
@@ -19,7 +19,7 @@ const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,remov
               type="text"
               value={education.degree || ""}
               onChange={({ target }) =>
-                updateArrayItem(index, "degree", target.value)
+                updateArrayItems(index, "degree", target.value)
               }
             />
             <Input
@@ -28,7 +28,7 @@ const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,remov
               type="text"
               value={education.institution || ""}
               onChange={({ target }) =>
-                updateArrayItem(index, "institution", target.value)
+                updateArrayItems(index, "institution", target.value)
               }
             />
             <Input
@@ -36,7 +36,7 @@ const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,remov
               type="month"
               value={education.startDate || ""}
               onChange={({ target }) =>
-                updateArrayItem(index, "startDate", target.value)
+                updateArrayItems(index, "startDate", target.value)
               }
             />
             <Input
@@ -44,7 +44,7 @@ const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,remov
               type="month"
               value={education.endDate || ""}
               onChange={({ target }) =>
-                updateArrayItem(index, "endDate", target.value)
+                updateArrayItems(index, "endDate", target.value)
               }
             />
           </div>
@@ -61,9 +61,9 @@ const EducationDetailsForm = ({educationInfo,updateArrayItems,addArrayItem,remov
       ))}
       <button
         type="button"
-        className="self-start flex items-center gap-2px-4 py-2 rounded bg-purple-100 text-purple-800 text-sm font-medium hover:bg-purple-200 cursor-pointer"
+        className="self-start flex items-center gap-2 px-4 py-2 rounded bg-purple-100 text-purple-800 text-sm font-medium hover:bg-purple-200 cursor-pointer"
         onClick={() =>
-          addArrayItem({
+          addArrayItems({
             degree: "",
             institution: "",
             startDate: "",
