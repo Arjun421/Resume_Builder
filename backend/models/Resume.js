@@ -33,13 +33,19 @@ const ResumeSchema = new mongoose.Schema({
 
 
   },
-  workExperience:{
+  workExperience:[{
+    company:String,
+    role:String,
+    startDate:String,
+    endDate:String,
+    description:String
+  }],
+  education:[{
     degree:String,
     institution:String,
     startDate:String,
     endDate:String,
-
-  },
+  }],
   skills:[{
     name:String,
     progress:Number
