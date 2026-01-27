@@ -120,7 +120,7 @@ const [currentPage, setCurrentPage] = useState("profile-info");
 
     }
   ],
-  language:[
+  languages:[
     {
       name:"",
       progress:0
@@ -381,35 +381,7 @@ const renderForm = () => {
       updateSection={updateSection}
     />
   );
-  case "certifications":
-  return (
-    <CertificationInfoForm
-      projectInfo={resumeData?.certification}
-      updateArrayItem={(index, key, value) => {
-        updateArrayItem("certifications", index, key, value);
-      }}
-      addArrayItem={(newItem) => addArrayItems("certifications", newItem)}
-      removeArrayItem={(index) =>
-        removeArrayItem("certifications", index)
-      }
-    />
-  );
-  case "additionalInfo":
-  return (
-    <AdditionalInfoForm
-      languages={resumeData.language}
-      interests={resumeData.interests}
-      updateArrayItem={(section, index, key, value) =>
-        updateArrayItem(section, index, key, value)
-      }
-      addArrayItem={(section, newItem) =>
-        addArrayItem(section, newItem)
-      }
-      removeArrayItem={(section, index) =>
-        removeArrayItem(section, index)
-      }
-    />
-  );
+
     default:
       return null
   }
@@ -488,7 +460,7 @@ const renderForm = () => {
           skills: resumeInfo?.skills || prevState?.skills,
           projects: resumeInfo?.projects || prevState?.projects,
           certification: resumeInfo?.certification || prevState.certification,
-          language: resumeInfo?.language || prevState?.language,
+          languages: resumeInfo?.languages || prevState?.languages,
           interests: resumeInfo?.interests || prevState?.interests,
         }));
       }
@@ -498,6 +470,38 @@ const renderForm = () => {
     }
   }
   const uploadResumeImages = async ()=>{}
+  
+  const saveResumeData = async () => {
+    try {
+      setIsLoading(true);
+      setErrorMsg("");
+      
+      console.log('💾 Saving resume data:', resumeData);
+      
+      const response = await axiosInstance.put(
+        API_PATHS.RESUME.UPDATE(resumeId),
+        resumeData
+      );
+      
+      if (response.data && response.data.success) {
+        toast.success("Resume updated successfully!");
+        // Navigate back to dashboard after successful save
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+      } else {
+        throw new Error(response.data?.message || "Failed to update resume");
+      }
+    } catch (error) {
+      console.error('❌ Error saving resume:', error);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to update resume";
+      setErrorMsg(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const updateResumeDetails = async(thumbnailLink,profilePreviewUrl)=>{}
   const handleDeleteResume = async()=>{}
   const reactToPrintFn=useReactToPrint({contentRef:resumeDownloadRef})
@@ -516,9 +520,14 @@ const renderForm = () => {
     setProgress(calculateProgress());
     
     return ()=>{
-      window.addEventListener('resize',updateBaseWidth)
+      window.removeEventListener('resize',updateBaseWidth)
     }
-  },[currentPage])
+  },[resumeId]) // Only depend on resumeId, not currentPage
+
+  // Separate useEffect for updating progress when page changes
+  useEffect(() => {
+    setProgress(calculateProgress());
+  }, [currentPage])
 return (
   <DashboardLayout>
     <div className="container mx-auto">
@@ -554,7 +563,7 @@ return (
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-        {/* {<div className='bg-white rounded-lg border border-purple-100 overflow-hidden'>
+        { <div className='bg-white rounded-lg border border-purple-100 overflow-hidden'>
           <StepProgress progress={calculateProgress()} />
           {renderForm()}
           <div className='mx-5'>
@@ -574,7 +583,7 @@ return (
 
             </button>
             <button className='btn-small-light'
-              onClick={uploadResumeImages}
+              onClick={saveResumeData}
               disabled={isLoading}
               >
                 <LuSave className='text-[16px]'/>
@@ -597,8 +606,8 @@ return (
             </button>
             </div>
           </div>
-        </div>} */}
-        <div  ref={resumeRef} className='h-[100vh]'>
+        </div>} 
+        <div ref={resumeRef} className='h-[100vh] overflow-auto'>
           {/*Resume Template*/}
           <RenderResume
           templateId={resumeData?.template?.theme || ""}
