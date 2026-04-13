@@ -62,7 +62,7 @@ const ResumeSchema = new mongoose.Schema({
 certification:[
   {
     title:String,
-    isuser:String,
+    issuer:String,
     year:String
   }
 ],

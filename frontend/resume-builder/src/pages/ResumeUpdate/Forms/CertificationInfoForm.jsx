@@ -30,9 +30,9 @@ const CertificationInfoForm = ({certificationInfo, updateArrayItems, addArrayIte
                   label="Issuer"
                   placeholder="Amazon Web Services"
                   type="text"
-                  value={cert.issuser || ""}
+                  value={cert.issuer || ""}
                   onChange={({ target }) =>
-                    updateArrayItems(index, "issuser", target.value)
+                    updateArrayItems(index, "issuer", target.value)
                   }
                 />
               </div>
@@ -72,7 +72,7 @@ const CertificationInfoForm = ({certificationInfo, updateArrayItems, addArrayIte
         onClick={() =>
           addArrayItems({
             title: "",
-            issuser: "",
+            issuer: "",
             year: ""
           })
         }

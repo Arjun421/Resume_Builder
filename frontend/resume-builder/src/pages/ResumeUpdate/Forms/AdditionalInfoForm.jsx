@@ -21,7 +21,7 @@ const AdditionalInfoForm = ({languageInfo, interestsInfo, updateArrayItems, addA
                   type="text"
                   value={language.name || ""}
                   onChange={({ target }) =>
-                    updateArrayItems("language", index, "name", target.value)
+                    updateArrayItems("languages", index, "name", target.value)
                   }
                 />
               </div>
@@ -38,7 +38,7 @@ const AdditionalInfoForm = ({languageInfo, interestsInfo, updateArrayItems, addA
                     <button
                       key={rating}
                       type="button"
-                      onClick={() => updateArrayItems("language", index, "progress", rating * 20)}
+                      onClick={() => updateArrayItems("languages", index, "progress", rating * 20)}
                       className={`w-8 h-8 rounded-lg transition-colors cursor-pointer ${
                         Math.round((language.progress || 0)/20) >= rating
                           ? 'bg-purple-600'
@@ -53,7 +53,7 @@ const AdditionalInfoForm = ({languageInfo, interestsInfo, updateArrayItems, addA
                   <button
                     type="button"
                     className="text-red-600 hover:text-red-800 text-xs flex items-center gap-1"
-                    onClick={() => removeArrayItem("language", index)}
+                    onClick={() => removeArrayItem("languages", index)}
                   >
                     <LuTrash2 size={12} /> Remove
                   </button>
@@ -68,7 +68,7 @@ const AdditionalInfoForm = ({languageInfo, interestsInfo, updateArrayItems, addA
           type="button"
           className="mt-4 flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
           onClick={() =>
-            addArrayItems("language", {
+            addArrayItems("languages", {
               name: "",
               progress: 0
             })

@@ -80,7 +80,7 @@ const TemplateOne = ({ resumeData, colorPalette, containerWidth }) => {
         transformOrigin: "top left",
         width: "100%",
         maxWidth: "800px",
-        height: "auto",
+        height: "fit-content",
       }}
     >
       <div className="grid grid-cols-12 gap-4">
@@ -240,20 +240,24 @@ const TemplateOne = ({ resumeData, colorPalette, containerWidth }) => {
           </div>
           <div className="mt-4">
             <Title text="Skills" color={themeColors[1]}/>
-            <SkillSection
-              skills={resumeData.skills}
-              accentColor={themeColors[3]}
-              bgColor={themeColors[2]}
-            />
+            {resumeData.skills && resumeData.skills.length > 0 && resumeData.skills.filter(skill => skill.name).length > 0 ? (
+              <SkillSection
+                skills={resumeData.skills}
+                accentColor={themeColors[3]}
+                bgColor={themeColors[2]}
+              />
+            ) : (
+              <p className="text-xs text-gray-500">No skills available</p>
+            )}
           </div>
           <div className="mt-4">
-            <Title text="Certifications" color={themeColors[3]}/>
+            <Title text="Certifications" color={themeColors[1]}/>
             <div className="grid grid-cols-2 gap-2">
               {resumeData.certification && resumeData.certification.map((data, index) => (
                 <CertificationInfo
                   key={`cert_${index}`}
                   title={data.title}
-                  issuer={data.isuser}
+                  issuer={data.issuer}
                   year={data.year}
                   bgColor={themeColors[2]}
                 />

@@ -3,6 +3,7 @@ import { useNavigate,useParams } from 'react-router-dom';
 import  TitleInput from "../../components/Inputs/TitleInput";
 import { useReactToPrint } from 'react-to-print';
 import { API_PATHS } from "../../utils/apiPath";
+import { themeColorPalette } from "../../utils/data";
 
 import {
   LuArrowLeft,
@@ -25,17 +26,16 @@ import ProjectsDetailFrom from './Forms/ProjectsDetailFrom';
 import CertificationInfoForm from './Forms/CertificationInfoForm';
 import AdditionalInfoForm from './Forms/AdditionalInfoForm';
 import RenderResume from '../../components/ResumeTemplates/RenderResume';
+import ThemeSelector from './Forms/ThemeSelector';
+import Modal from '../../components/Modal';
 const EditResume = () => {
   const { resumeId } = useParams();
   const navigate = useNavigate();
 
   const resumeRef = useRef(null);
   const resumeDownloadRef = useRef(null);
-
   const [baseWidth, setBaseWidth] = useState(800);
-
   const [openThemeSelector, setOpenThemeSelector] = useState(false);
-
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
 
 const [currentPage, setCurrentPage] = useState("profile-info");
@@ -71,8 +71,8 @@ const [currentPage, setCurrentPage] = useState("profile-info");
     summary: "",
   },
   template: {
-    theme: "",
-    colorPalette: "",
+    theme: "01",
+    colorPalette: themeColorPalette.themeOne[0],
   },
   contactInfo: {
     email: "",
@@ -115,9 +115,8 @@ const [currentPage, setCurrentPage] = useState("profile-info");
   certification:[
     {
       title:"",
-      issuser:"",
+      issuer:"",
       year:""
-
     }
   ],
   languages:[
@@ -373,7 +372,7 @@ const renderForm = () => {
   case "additionalInfo":
   return (
     <AdditionalInfoForm
-      languageInfo={resumeData?.language}
+      languageInfo={resumeData?.languages}
       interestsInfo={resumeData?.interests}
       updateArrayItems={updateArrayItems}
       addArrayItems={addArrayItems}
@@ -503,8 +502,21 @@ const renderForm = () => {
   };
   
   const updateResumeDetails = async(thumbnailLink,profilePreviewUrl)=>{}
-  const handleDeleteResume = async()=>{}
-  const reactToPrintFn=useReactToPrint({contentRef:resumeDownloadRef})
+  
+  const handleDeleteResume = async () => {
+    if (!window.confirm("Are you sure you want to delete this resume?")) return;
+    try {
+      const response = await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId));
+      if (response.data && response.data.success) {
+        toast.success("Resume deleted!");
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      toast.error("Failed to delete resume");
+    }
+  };
+
+  const reactToPrintFn = useReactToPrint({ contentRef: resumeDownloadRef });
   const updateBaseWidth=()=>{
     if (resumeRef.current){
       setBaseWidth(resumeRef.current.offsetWidth)
@@ -553,13 +565,10 @@ return (
             <span className='hidden md:block'>Delete</span>
 
           </button>
-          <button className='btn-small-light'
-          onClick={()=>setOpenPreviewModal(true)}
-          >
-          <LuDownload className='text-[16px]'/>
+          <button className='btn-small-light' onClick={() => setOpenPreviewModal(true)}>
+            <LuDownload className='text-[16px]'/>
             <span className='hidden md:block'>Preview & Download</span>
           </button>
-          
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
@@ -593,9 +602,6 @@ return (
               onClick={validateAndNext}
               disabled={isLoading}
               >
-                {currentPage==="additionalInfo" && (
-                  <LuDownload className='text-[16px]'/>
-                )}
                 {currentPage==="additionalInfo"
                 ? "Preview and Download" : "Next"
                 }
@@ -610,9 +616,9 @@ return (
         <div ref={resumeRef} className='h-[100vh] overflow-auto'>
           {/*Resume Template*/}
           <RenderResume
-          templateId={resumeData?.template?.theme || ""}
+          templateId={resumeData?.template?.theme || "01"}
           resumeData={resumeData}
-          colorPalette={resumeData?.template?.colorPalette || []}
+          colorPalette={resumeData?.template?.colorPalette || themeColorPalette.themeOne[0]}
           containerWidth={baseWidth}
           
           />
@@ -621,6 +627,63 @@ return (
       
   
     </div>
+    <Modal
+  isOpen={openThemeSelector}
+  onClose={() => setOpenThemeSelector(false)}
+  title="Change Theme"
+>
+  <div className="w-[90vw] h-[80vh]">
+    <ThemeSelector
+      selectedTheme={resumeData?.template}
+      setSelectedTheme={(value) => {
+        setResumeData((prevState) => ({
+          ...prevState,
+          template: value || prevState.template,
+        }));
+      }}
+      resumeData={null}
+      onClose={() => setOpenThemeSelector(false)}
+    />
+  </div>
+</Modal>
+
+{openPreviewModal && (
+  <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+    <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-white shadow-sm">
+      <h1 className="text-base font-semibold text-gray-900">
+        {resumeData?.title || "Resume Preview"}
+      </h1>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={reactToPrintFn}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium"
+        >
+          <LuDownload className="text-[14px]" />
+          Download
+        </button>
+        <button
+          onClick={() => setOpenPreviewModal(false)}
+          className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full text-xl"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+    <div className="flex-1 overflow-auto bg-gray-50 py-8">
+      <div className="mx-auto w-fit">
+        <div ref={resumeDownloadRef}>
+          <RenderResume
+            templateId={resumeData?.template?.theme || "01"}
+            resumeData={resumeData}
+            colorPalette={resumeData?.template?.colorPalette || themeColorPalette.themeOne[0]}
+            containerWidth={800}
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
   </DashboardLayout>
   
 );
