@@ -6,7 +6,7 @@ const {
   updateResume,
   deleteResume,
 } = require("../controllers/resumeController")
-const {protect}=require("../middlewares/authmiddleware")
+const {protect}=require("../middlewares/authMiddleware")
 const {uploadResumeImages}=require("../controllers/uploadImages")
 const upload = require("../middlewares/uploadMiddleware")
 
